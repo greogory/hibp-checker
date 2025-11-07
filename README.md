@@ -1,8 +1,14 @@
 # HIBP Comprehensive Breach & Credential Stuffing Checker
 
+**Platform**: Linux only (bash scripts)
+**Dependencies**: Python 3.6+, bash, requests library
+**Claude Code**: Optional (works standalone)
+
 ## Overview
 
 This automated workflow goes beyond basic breach checking to provide deep insights into password compromises, stealer logs, and credential stuffing threats from Have I Been Pwned's databases.
+
+This tool is **completely standalone** and does not require Claude Code to run. While it was developed with Claude Code integration in mind, all functionality works independently via command line.
 
 ## Key Features
 
@@ -12,8 +18,9 @@ This automated workflow goes beyond basic breach checking to provide deep insigh
 - **Critical Site Identification**: Flags compromises on banking, cloud, and authentication services
 - **Pwned Password Checking**: Validates passwords against 900+ million compromised credentials
 - **Multi-format Reporting**: JSON, CSV, and human-readable text reports
-- **Claude Code Integration**: Designed for seamless automation with Claude Code CLI
+- **Standalone Operation**: Works entirely from command line, no external tools required
 - **Multiple Email Support**: Monitor unlimited email addresses with a single configuration
+- **Optional Claude Code Integration**: Can be used with Claude Code CLI for enhanced automation
 
 ## Multiple Email Address Setup
 
@@ -130,12 +137,27 @@ The "Synthient Credential Stuffing Threat Data" is incorporated into HIBP's stea
 
 Our tool specifically queries the stealer log API endpoints to identify where your credentials may be actively exploited.
 
+## System Requirements
+
+- **Operating System**: Linux (tested on CachyOS/Arch, should work on Debian/Ubuntu/Fedora)
+- **Python**: 3.6 or higher
+- **Shell**: Bash 4.0+
+- **Dependencies**: `python3`, `requests` library
+
+> **Note**: This tool is designed specifically for Linux. It will not work on Windows or macOS without modifications due to bash-specific features and script structure.
+
 ## Installation
 
 ```bash
-# Clone or download the scripts
+# Clone the repository
+git clone https://github.com/greogory/hibp-checker.git
+cd hibp-checker
+
+# Make scripts executable
 chmod +x hibp_workflow.sh
 chmod +x hibp_comprehensive_checker.py
+chmod +x quick_start.sh
+chmod +x multi_email_setup.sh
 
 # Install Python dependencies (minimal - uses stdlib mostly)
 pip3 install requests
@@ -266,7 +288,9 @@ python3 hibp_comprehensive_checker.py \
     -o json
 ```
 
-### Claude Code Integration
+### Claude Code Integration (Optional)
+
+If you're using [Claude Code](https://claude.com/code), you can optionally integrate this tool:
 
 ```bash
 # One-time setup
@@ -278,6 +302,8 @@ claude-code run ./hibp_workflow.sh check
 # Schedule automated checks (via cron)
 claude-code run ./hibp_workflow.sh schedule
 ```
+
+**Note**: Claude Code is completely optional. All commands work standalone without it by simply running `./hibp_workflow.sh` directly.
 
 ### Automation Workflow
 
@@ -443,13 +469,36 @@ trigger_actions() {
   failed_when: hibp_result.rc == 2
 ```
 
-**With Docker:**
+**With Docker (Linux-based image):**
 ```dockerfile
 FROM python:3.9-slim
 COPY hibp_*.py /app/
-RUN pip install requests
+COPY *.sh /app/
+RUN pip install requests && chmod +x /app/*.sh
 ENTRYPOINT ["python3", "/app/hibp_comprehensive_checker.py"]
 ```
+
+## Platform Compatibility
+
+### Linux ✅
+Fully supported and tested on:
+- CachyOS (Arch-based)
+- Ubuntu/Debian
+- Fedora/RHEL
+- Other Linux distributions with bash 4.0+
+
+### macOS ❌
+Not currently supported due to:
+- Bash-specific features (requires bash 4.0+, macOS ships with bash 3.2)
+- Linux-specific command options
+- Path and process handling differences
+
+**Workaround**: Use Docker with a Linux-based image or run in a Linux VM
+
+### Windows ❌
+Not supported. The bash scripts require a Linux environment.
+
+**Workaround**: Use WSL2 (Windows Subsystem for Linux) or Docker
 
 ## License
 

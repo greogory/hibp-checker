@@ -2,6 +2,8 @@
 
 **Date**: 2025-11-07
 **Location**: `~/claude-archive/projects/hibp-project/`
+**Platform**: Linux only (CachyOS/Arch Linux tested)
+**Claude Code Required**: No (completely standalone)
 
 ## Test Summary
 
