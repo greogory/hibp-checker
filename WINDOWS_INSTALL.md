@@ -1,5 +1,17 @@
 # Installing HIBP Checker on Windows
 
+---
+
+## ⚡ Powered by Have I Been Pwned
+
+This tool uses data from **[Have I Been Pwned](https://haveibeenpwned.com)** by Troy Hunt, licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
+
+**Prerequisites**: Requires a **[Have I Been Pwned API subscription](https://haveibeenpwned.com/API/Key)** (Pwned 1-4 tier). See [HIBP API documentation](https://haveibeenpwned.com/API/v3) for details.
+
+**Support HIBP**: Consider [subscribing](https://haveibeenpwned.com/API/Key) or [donating](https://haveibeenpwned.com/Donate) to help maintain this critical security service.
+
+---
+
 This guide provides detailed instructions for running the HIBP Comprehensive Breach Checker on Windows using either WSL2 (recommended) or Docker.
 
 ## Table of Contents

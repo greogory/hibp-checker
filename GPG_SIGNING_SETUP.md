@@ -1,5 +1,13 @@
 # GPG Commit Signing Setup Guide
 
+---
+
+## ⚡ Powered by Have I Been Pwned
+
+This project uses data from **[Have I Been Pwned](https://haveibeenpwned.com)** by Troy Hunt, licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
+
+---
+
 This guide helps you set up GPG signing for your commits so GitHub shows them as "Verified".
 
 ## Current Status
