@@ -1,5 +1,13 @@
 # Environment Variable Implementation Test Results
 
+---
+
+## ⚡ Powered by Have I Been Pwned
+
+This tool uses data from **[Have I Been Pwned](https://haveibeenpwned.com)** by Troy Hunt, licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
+
+---
+
 **Date**: 2025-11-07
 **Test**: Environment variable support for HIBP_API_KEY
 

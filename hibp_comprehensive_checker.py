@@ -1,6 +1,19 @@
 #!/usr/bin/env python3
 """
 HIBP Comprehensive Breach & Credential Stuffing Checker
+
+⚡ Powered by Have I Been Pwned (https://haveibeenpwned.com) by Troy Hunt
+   Licensed under Creative Commons Attribution 4.0 International (CC BY 4.0)
+   https://creativecommons.org/licenses/by/4.0/
+
+   This tool uses data from Have I Been Pwned. All breach and paste data
+   is sourced from HIBP and must be attributed per CC BY 4.0 license.
+
+Prerequisites:
+   - Requires Have I Been Pwned API subscription (Pwned 1-4 tier)
+   - Get API Key: https://haveibeenpwned.com/API/Key
+   - API Documentation: https://haveibeenpwned.com/API/v3
+
 Author: Bosco's Automation Workflow
 Purpose: Deep dive into HIBP data to identify password compromises,
          stealer logs, and credential stuffing threats

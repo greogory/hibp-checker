@@ -1,5 +1,15 @@
 # HIBP Automation Workflow - Project Structure
 
+---
+
+## ⚡ Powered by Have I Been Pwned
+
+This tool uses data from **[Have I Been Pwned](https://haveibeenpwned.com)** by Troy Hunt, licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).
+
+**Prerequisites**: Requires a **[Have I Been Pwned API subscription](https://haveibeenpwned.com/API/Key)**. See [HIBP API documentation](https://haveibeenpwned.com/API/v3).
+
+---
+
 ## Files Overview
 
 ```

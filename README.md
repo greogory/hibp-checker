@@ -1,7 +1,42 @@
 # HIBP Comprehensive Breach & Credential Stuffing Checker
 
+---
+
+## ⚡ Powered by Have I Been Pwned
+
+**This tool is built on top of the [Have I Been Pwned](https://haveibeenpwned.com) service created by Troy Hunt.**
+
+HIBP is a free service that aggregates data breaches and helps people discover if they've been affected. This project uses HIBP's APIs to provide automated monitoring and comprehensive breach analysis.
+
+### 📜 Attribution & Licensing
+
+This project uses data from **Have I Been Pwned**, licensed under [Creative Commons Attribution 4.0 International (CC BY 4.0)](https://creativecommons.org/licenses/by/4.0/).
+
+- **Breach & Paste Data**: Licensed under CC BY 4.0 - requires clear attribution with link to haveibeenpwned.com
+- **Pwned Passwords API**: Freely accessible, no licensing requirements (attribution welcomed)
+- **Data Source**: All breach data sourced from [Have I Been Pwned](https://haveibeenpwned.com)
+
+### 🙏 Gratitude
+
+**Immense thanks to Troy Hunt** for creating and maintaining Have I Been Pwned as a free public service. HIBP has helped millions of people secure their online accounts and understand their exposure to data breaches.
+
+**Support HIBP**: Consider [subscribing to HIBP](https://haveibeenpwned.com/API/Key) or [donating](https://haveibeenpwned.com/Donate) to help keep this critical security service running.
+
+### ⚠️ Prerequisites - HIBP API Key Required
+
+**MANDATORY REQUIREMENT**: This tool requires a **Have I Been Pwned API subscription** (Pwned 1-4 tier) to function.
+
+- **Get API Key**: [Subscribe to HIBP API](https://haveibeenpwned.com/API/Key)
+- **Subscription Tiers**: Pwned 1, Pwned 2, Pwned 3, or Pwned 4
+- **API Terms**: Review [HIBP API documentation](https://haveibeenpwned.com/API/v3) for usage terms
+- **License Requirements**: Must provide attribution per CC BY 4.0 license
+
+**The Pwned Passwords API is free and does not require a subscription**, but breach checking, paste monitoring, and stealer log queries require a paid API key.
+
+---
+
 **Platform**: Linux only (bash scripts) | [Windows guide](WINDOWS_INSTALL.md)
-**Dependencies**: Python 3.6+, bash, requests library
+**Dependencies**: Python 3.6+, bash, requests library, **HIBP API subscription**
 **Claude Code**: Optional (works standalone)
 
 ## Overview

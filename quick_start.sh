@@ -2,6 +2,14 @@
 
 # HIBP Quick Start & Test Script
 # Uses HIBP's test accounts to verify everything works before using real data
+#
+# ⚡ Powered by Have I Been Pwned (https://haveibeenpwned.com) by Troy Hunt
+#    Licensed under Creative Commons Attribution 4.0 International (CC BY 4.0)
+#    https://creativecommons.org/licenses/by/4.0/
+#
+# Prerequisites:
+#    - Requires Have I Been Pwned API subscription (Pwned 1-4 tier)
+#    - Get API Key: https://haveibeenpwned.com/API/Key
 
 set -euo pipefail
 
