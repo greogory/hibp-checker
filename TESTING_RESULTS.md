@@ -64,7 +64,10 @@ Paste Exposures: 83
 
 ### Current Settings
 ```bash
-HIBP_API_KEY="5a73c5b5d367488092932aecd23edba6"
+# API Key: Set via environment variable (recommended)
+export HIBP_API_KEY="your-key-here"
+
+# Config file settings:
 EMAIL_FILE="./my_emails.txt"
 OUTPUT_FORMAT="text"
 API_DELAY=6  # 10 RPM (Pwned 1 subscription)

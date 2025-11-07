@@ -73,17 +73,35 @@ chmod +x multi_email_setup.sh
 pip3 install requests
 ```
 
-### Step 5: Configure
+### Step 5: Configure API Key
+
+**Method 1 (Recommended): Environment Variable**
+
+Add to your `~/.bashrc`:
+
+```bash
+echo 'export HIBP_API_KEY="your-32-character-api-key-here"' >> ~/.bashrc
+source ~/.bashrc
+```
+
+Verify it's set:
+```bash
+echo $HIBP_API_KEY
+```
+
+**Method 2 (Alternative): Config File**
 
 ```bash
 # Copy example config
 cp hibp_config.conf.example hibp_config.conf
 
-# Edit configuration with nano or vim
+# Edit configuration with nano
 nano hibp_config.conf
 ```
 
-Add your HIBP API key and configure email settings. Press `Ctrl+X`, then `Y`, then `Enter` to save in nano.
+Add your HIBP API key to the `HIBP_API_KEY=""` line. Press `Ctrl+X`, then `Y`, then `Enter` to save in nano.
+
+> **Security Note**: Environment variables are recommended as they're more secure than storing keys in config files.
 
 ### Step 6: Create Email List
 

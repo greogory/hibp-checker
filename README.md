@@ -161,9 +161,50 @@ chmod +x multi_email_setup.sh
 
 # Install Python dependencies (minimal - uses stdlib mostly)
 pip3 install requests
+```
 
-# Run interactive setup
-./hibp_workflow.sh setup
+## Configuration
+
+### Step 1: Set Your API Key (Recommended: Environment Variable)
+
+**Method 1 (Recommended): Environment Variable**
+
+Add to your `~/.bashrc` or `~/.zshrc`:
+
+```bash
+export HIBP_API_KEY="your-32-character-api-key-here"
+```
+
+Then reload your shell:
+```bash
+source ~/.bashrc  # or source ~/.zshrc
+```
+
+**Method 2 (Alternative): Config File**
+
+If you prefer not to use environment variables, you can set the API key in the config file:
+
+```bash
+cp hibp_config.conf.example hibp_config.conf
+nano hibp_config.conf  # Edit and add your API key
+```
+
+> **Security Note**: Environment variables are more secure than storing keys in config files, especially if the config file is version controlled or accessible by other users.
+
+### Step 2: Configure Email Addresses
+
+```bash
+# Copy template
+cp my_emails_template.txt my_emails.txt
+
+# Edit and add your email addresses (one per line)
+nano my_emails.txt
+```
+
+### Step 3: Run Your First Check
+
+```bash
+./hibp_workflow.sh check
 ```
 
 ## Quick Start for Multiple Emails
@@ -241,16 +282,18 @@ hibp_security_check:
   allow_failure: false
 ```
 
-## Configuration
+## Configuration Reference
 
 The tool uses `hibp_config.conf` for settings:
 
 ```bash
-# Required
-HIBP_API_KEY="your-32-character-api-key-here"
+# API Key (RECOMMENDED: Use environment variable instead)
+# export HIBP_API_KEY="your-key" in ~/.bashrc or ~/.zshrc
+# Leave blank here to use environment variable
+HIBP_API_KEY=""
 
 # Email sources (use one or both)
-EMAIL_ADDRESSES="bosco@example.com admin@company.com"
+EMAIL_ADDRESSES="user@example.com admin@company.com"
 EMAIL_FILE="/path/to/emails.txt"
 
 # Optional password checking
@@ -263,6 +306,10 @@ VERBOSE=true
 SEND_NOTIFICATIONS=true
 SLACK_WEBHOOK="https://hooks.slack.com/services/..."
 ```
+
+**Priority order for API key:**
+1. Environment variable `$HIBP_API_KEY` (recommended)
+2. Value set in `hibp_config.conf`
 
 ## Usage
 

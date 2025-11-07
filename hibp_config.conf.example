@@ -7,7 +7,14 @@
 # ==========================================
 # Get your API key from: https://haveibeenpwned.com/API/Key
 # This is a 32-character hexadecimal key
-HIBP_API_KEY="YOUR_API_KEY_HERE"
+#
+# RECOMMENDED METHOD: Use environment variable
+# Add to ~/.bashrc or ~/.zshrc:
+#   export HIBP_API_KEY="your-32-character-key-here"
+#
+# ALTERNATIVE METHOD: Set in this file (less secure)
+# Leave blank to use environment variable
+HIBP_API_KEY=""
 
 # ==========================================
 # Email Addresses to Monitor

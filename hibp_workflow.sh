@@ -52,9 +52,18 @@ log() {
 
 # Load configuration
 load_config() {
+    # Preserve environment variable if already set (recommended method)
+    local env_api_key="$HIBP_API_KEY"
+
     if [[ -f "$CONFIG_FILE" ]]; then
         source "$CONFIG_FILE"
         log INFO "Configuration loaded from $CONFIG_FILE"
+
+        # If environment variable was set, use it (takes precedence)
+        if [[ -n "$env_api_key" ]]; then
+            HIBP_API_KEY="$env_api_key"
+            log INFO "Using HIBP_API_KEY from environment variable"
+        fi
     else
         log ERROR "Configuration file not found: $CONFIG_FILE"
         log INFO "Creating default configuration file..."
@@ -143,8 +152,11 @@ EOF
 
 # Validate configuration
 validate_config() {
+    # Check environment variable first (recommended), then config file
     if [[ -z "$HIBP_API_KEY" ]]; then
-        log ERROR "HIBP_API_KEY is not set in configuration"
+        log ERROR "HIBP_API_KEY is not set"
+        log ERROR "Set it via environment variable: export HIBP_API_KEY=\"your-key\""
+        log ERROR "Or set it in hibp_config.conf"
         exit 1
     fi
     
