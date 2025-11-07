@@ -1,6 +1,6 @@
 # HIBP Comprehensive Breach & Credential Stuffing Checker
 
-**Platform**: Linux only (bash scripts)
+**Platform**: Linux only (bash scripts) | [Windows guide](WINDOWS_INSTALL.md)
 **Dependencies**: Python 3.6+, bash, requests library
 **Claude Code**: Optional (works standalone)
 
@@ -496,9 +496,11 @@ Not currently supported due to:
 **Workaround**: Use Docker with a Linux-based image or run in a Linux VM
 
 ### Windows ❌
-Not supported. The bash scripts require a Linux environment.
+Not supported natively. The bash scripts require a Linux environment.
 
 **Workaround**: Use WSL2 (Windows Subsystem for Linux) or Docker
+
+📖 **[See detailed Windows installation guide](WINDOWS_INSTALL.md)**
 
 ## License
 
