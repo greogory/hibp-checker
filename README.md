@@ -668,6 +668,70 @@ Not supported natively. The bash scripts require a Linux environment.
 
 MIT - Free for personal and commercial use
 
+See [LICENSE](LICENSE) file for full MIT license text.
+
+## Legal Disclaimer
+
+### Use at Your Own Risk
+
+This software is provided "AS IS" without warranty of any kind, express or implied. The maintainer makes no representations or warranties regarding:
+- Functionality or fitness for any particular purpose
+- Accuracy of breach data or security assessments
+- Compliance with any laws or regulations
+- Freedom from errors or defects
+
+### Limited Liability
+
+**The maintainer shall NOT be liable for:**
+- Any damages arising from use or inability to use this software
+- Any security breaches, data loss, or privacy violations
+- Any claims by third parties
+- Any legal consequences of using this software
+- Any actions taken based on the tool's output
+
+### User Responsibility
+
+Users are solely responsible for:
+- Obtaining proper authorization before checking email addresses
+- Complying with HIBP Terms of Service and API usage guidelines
+- Compliance with local data protection and privacy laws (GDPR, CCPA, etc.)
+- Securing API keys and preventing unauthorized access
+- Validating and interpreting breach data appropriately
+- Any security decisions made based on the tool's output
+
+### No Security Guarantees
+
+This tool provides information only - it does not:
+- Guarantee detection of all breaches
+- Provide complete security protection
+- Replace professional security audits
+- Constitute security advice or recommendations
+
+### Third-Party Data
+
+Breach data is provided by Have I Been Pwned. The maintainer:
+- Does not control or verify the accuracy of HIBP data
+- Is not responsible for HIBP service availability or accuracy
+- Cannot guarantee data completeness or timeliness
+
+### No Legal or Professional Advice
+
+Nothing in this tool constitutes legal, security, or professional advice. For specific guidance, consult qualified professionals.
+
+### Indemnification
+
+By using this software, you agree to indemnify and hold harmless the maintainer from any claims, damages, or legal issues arising from your use.
+
+### API Key Security
+
+Users are responsible for:
+- Securing their HIBP API keys
+- Not sharing or exposing API keys
+- Monitoring API key usage
+- Any costs or damages from API key misuse
+
+For additional security information, see [SECURITY.md](SECURITY.md).
+
 ## Support
 
 For HIBP API issues: https://haveibeenpwned.com/API/v3
