@@ -1,5 +1,10 @@
 # HIBP Comprehensive Breach & Credential Stuffing Checker
 
+**Version**: 2.0.0 | **License**: MIT | **Data License**: [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) (HIBP)
+**Platform**: Linux, Windows (Docker/WSL2), macOS (Docker) | **Language**: Python 3.6+, Bash
+**Dependencies**: Python 3.6+, Flask 2.0+, requests, **HIBP API subscription required**
+**Features**: Web dashboard, systemd automation, stealer log detection, pwned password checking
+
 ---
 
 ## ⚡ Powered by Have I Been Pwned
@@ -736,6 +741,44 @@ For additional security information, see [SECURITY.md](SECURITY.md).
 
 For HIBP API issues: https://haveibeenpwned.com/API/v3
 For tool issues: Create an issue or PR
+
+---
+
+## References & Related Projects
+
+### Have I Been Pwned Resources
+- **HIBP Service**: [haveibeenpwned.com](https://haveibeenpwned.com)
+- **HIBP API Documentation**: [API v3 Documentation](https://haveibeenpwned.com/API/v3)
+- **API Key Subscription**: [Get API Key](https://haveibeenpwned.com/API/Key)
+- **HIBP Donate**: [Support HIBP](https://haveibeenpwned.com/Donate)
+- **Troy Hunt's Blog**: [troyhunt.com](https://troyhunt.com/)
+
+### Related Security Tools
+- **Bitwarden**: [bitwarden.com](https://bitwarden.com/) - Password manager with breach monitoring
+- **1Password Watchtower**: [1password.com/watchtower](https://1password.com/watchtower/) - Password breach detection
+- **Firefox Monitor**: [monitor.firefox.com](https://monitor.firefox.com/) - Mozilla's breach monitoring service
+- **Google Password Checkup**: [passwords.google.com](https://passwords.google.com/checkup) - Google's breach checking
+
+### Technical Resources
+- **Pwned Passwords k-Anonymity**: [Blog Post](https://www.troyhunt.com/ive-just-launched-pwned-passwords-version-2/) - How k-anonymity works
+- **Stealer Logs Explained**: [Blog Post](https://www.troyhunt.com/inside-the-massive-alleged-breach-of-twilio/) - Understanding credential stuffing data
+- **HIBP Data License**: [Creative Commons BY 4.0](https://creativecommons.org/licenses/by/4.0/)
+
+### Community & Support
+- **r/cybersecurity**: [reddit.com/r/cybersecurity](https://www.reddit.com/r/cybersecurity/)
+- **r/netsec**: [reddit.com/r/netsec](https://www.reddit.com/r/netsec/)
+- **Information Security Stack Exchange**: [security.stackexchange.com](https://security.stackexchange.com/)
+
+### Compliance Resources
+- **GDPR Information**: [European Commission - Data Protection](https://ec.europa.eu/info/law/law-topic/data-protection_en)
+- **CCPA Information**: [California Attorney General - CCPA](https://oag.ca.gov/privacy/ccpa)
+- **Data Breach Notification Laws**: [U.S. State Laws](https://www.ncsl.org/technology-and-communication/security-breach-notification-laws)
+
+### Technical Documentation
+- **Python Requests**: [docs.python-requests.org](https://docs.python-requests.org/) - HTTP library used
+- **Flask Framework**: [flask.palletsprojects.com](https://flask.palletsprojects.com/) - Web framework for dashboard
+- **Systemd Documentation**: [systemd.io](https://systemd.io/) - Linux service management
+- **Docker Documentation**: [docs.docker.com](https://docs.docker.com/) - Container platform
 
 ---
 
