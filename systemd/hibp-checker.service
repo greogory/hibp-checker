@@ -8,14 +8,14 @@ Wants=network-online.target
 Type=oneshot
 User=%u
 Group=%u
-WorkingDirectory=%h/claude-archive/projects/hibp-project
+WorkingDirectory=/raid0/ClaudeCodeProjects/hibp-project
 
 # Environment
 Environment="HIBP_API_KEY=%E"
 EnvironmentFile=-%h/.config/hibp-checker/hibp-checker.env
 
 # Execution
-ExecStart=%h/claude-archive/projects/hibp-project/hibp_workflow.sh check
+ExecStart=/raid0/ClaudeCodeProjects/hibp-project/hibp_workflow.sh check
 
 # Output
 StandardOutput=append:%h/.local/share/hibp-checker/hibp-checker.log
@@ -26,7 +26,7 @@ PrivateTmp=yes
 NoNewPrivileges=yes
 ProtectSystem=strict
 ProtectHome=read-only
-ReadWritePaths=%h/.local/share/hibp-checker %h/claude-archive/projects/hibp-project/reports %h/claude-archive/projects/hibp-project/logs
+ReadWritePaths=%h/.local/share/hibp-checker /raid0/ClaudeCodeProjects/hibp-project/reports /raid0/ClaudeCodeProjects/hibp-project/logs
 
 [Install]
 WantedBy=default.target

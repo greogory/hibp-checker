@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HIBP Breach Monitor Dashboard</title>
+    <title>HIBP Breach Monitor - Archive</title>
     <style>
         * {
             margin: 0;
@@ -42,49 +42,33 @@
             font-size: 0.95em;
         }
 
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin-bottom: 20px;
+        .nav-links {
+            margin-top: 15px;
+            display: flex;
+            gap: 15px;
         }
 
-        .stat-card {
-            background: white;
-            border-radius: 10px;
-            padding: 25px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            transition: transform 0.2s;
-        }
-
-        .stat-card:hover {
-            transform: translateY(-5px);
-        }
-
-        .stat-card h3 {
-            color: #718096;
-            font-size: 0.85em;
+        .nav-link {
+            padding: 8px 16px;
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
             font-weight: 600;
-            text-transform: uppercase;
-            margin-bottom: 10px;
+            transition: background 0.3s;
         }
 
-        .stat-value {
-            font-size: 2.5em;
-            font-weight: bold;
+        .nav-link:hover {
+            background: #5568d3;
+        }
+
+        .nav-link.secondary {
+            background: #e2e8f0;
             color: #2d3748;
         }
 
-        .stat-card.critical .stat-value {
-            color: #e53e3e;
-        }
-
-        .stat-card.warning .stat-value {
-            color: #dd6b20;
-        }
-
-        .stat-card.clean .stat-value {
-            color: #38a169;
+        .nav-link.secondary:hover {
+            background: #cbd5e0;
         }
 
         .tabs {
@@ -346,32 +330,25 @@
 <body>
     <div class="container">
         <header>
-            <h1>🔒 HIBP Breach Monitor</h1>
-            <p class="subtitle">Local dashboard for Have I Been Pwned breach reports and monitoring logs</p>
+            <h1>🔒 HIBP Breach Monitor - Archive</h1>
+            <p class="subtitle">All historical breach reports</p>
+            <div class="nav-links">
+                <a href="/" class="nav-link">← Back to Dashboard</a>
+            </div>
         </header>
 
-        <div class="stats-grid" id="statsGrid">
-            <div class="loading">
-                <div class="spinner"></div>
-                Loading statistics...
-            </div>
-        </div>
-
         <div class="tabs">
-            <button class="tab active" data-tab="reports">📊 Reports</button>
+            <button class="tab active" data-tab="reports">📊 All Reports</button>
             <button class="tab" data-tab="logs">📝 Logs</button>
         </div>
 
         <div id="reports" class="tab-content active">
             <div class="content-card">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                    <h2 style="color: #2d3748; margin: 0;">Latest Breach Report</h2>
-                    <a href="/archive" class="btn btn-secondary">View All Reports Archive →</a>
-                </div>
+                <h2 style="margin-bottom: 20px; color: #2d3748;">All Breach Reports</h2>
                 <div id="reportsList" class="reports-list">
                     <div class="loading">
                         <div class="spinner"></div>
-                        Loading latest report...
+                        Loading reports...
                     </div>
                 </div>
             </div>
@@ -418,38 +395,7 @@
             });
         });
 
-        // Load statistics
-        async function loadStats() {
-            try {
-                const response = await fetch('/api/stats');
-                const data = await response.json();
-
-                const statsHTML = `
-                    <div class="stat-card">
-                        <h3>Total Scans</h3>
-                        <div class="stat-value">${data.total_scans}</div>
-                    </div>
-                    <div class="stat-card critical">
-                        <h3>Total Breaches</h3>
-                        <div class="stat-value">${data.total_breaches}</div>
-                    </div>
-                    <div class="stat-card critical">
-                        <h3>Password Exposures</h3>
-                        <div class="stat-value">${data.total_password_exposures}</div>
-                    </div>
-                    <div class="stat-card warning">
-                        <h3>Stealer Logs</h3>
-                        <div class="stat-value">${data.total_stealer_logs}</div>
-                    </div>
-                `;
-
-                document.getElementById('statsGrid').innerHTML = statsHTML;
-            } catch (error) {
-                console.error('Error loading stats:', error);
-            }
-        }
-
-        // Load reports (only the most recent one for home page)
+        // Load reports (ALL reports for archive)
         async function loadReports() {
             try {
                 const response = await fetch('/api/reports');
@@ -460,33 +406,33 @@
                     return;
                 }
 
-                // Only show the most recent report (first one, as they're sorted by date)
-                const report = data.reports[0];
-                const date = new Date(report.timestamp).toLocaleString();
-                const severityBadge = report.severity.charAt(0).toUpperCase() + report.severity.slice(1);
+                const reportsHTML = data.reports.map(report => {
+                    const date = new Date(report.timestamp).toLocaleString();
+                    const severityBadge = report.severity.charAt(0).toUpperCase() + report.severity.slice(1);
 
-                const reportHTML = `
-                    <div class="report-item ${report.severity}" onclick="viewReport('${report.filename}')">
-                        <div class="report-header">
-                            <div class="report-title">${report.filename}</div>
-                            <span class="badge ${report.severity}">${severityBadge}</span>
+                    return `
+                        <div class="report-item ${report.severity}" onclick="viewReport('${report.filename}')">
+                            <div class="report-header">
+                                <div class="report-title">${report.filename}</div>
+                                <span class="badge ${report.severity}">${severityBadge}</span>
+                            </div>
+                            <div class="report-date">${date}</div>
+                            <div class="report-stats">
+                                <div class="report-stat">
+                                    <span>🔍</span> ${report.total_breaches} breaches
+                                </div>
+                                <div class="report-stat">
+                                    <span>🔑</span> ${report.password_exposures} password exposures
+                                </div>
+                                <div class="report-stat">
+                                    <span>📧</span> ${report.emails_checked.length} emails checked
+                                </div>
+                            </div>
                         </div>
-                        <div class="report-date">${date}</div>
-                        <div class="report-stats">
-                            <div class="report-stat">
-                                <span>🔍</span> ${report.total_breaches} breaches
-                            </div>
-                            <div class="report-stat">
-                                <span>🔑</span> ${report.password_exposures} password exposures
-                            </div>
-                            <div class="report-stat">
-                                <span>📧</span> ${report.emails_checked.length} emails checked
-                            </div>
-                        </div>
-                    </div>
-                `;
+                    `;
+                }).join('');
 
-                document.getElementById('reportsList').innerHTML = reportHTML;
+                document.getElementById('reportsList').innerHTML = reportsHTML;
             } catch (error) {
                 console.error('Error loading reports:', error);
                 document.getElementById('reportsList').innerHTML = '<p style="color: #e53e3e;">Error loading reports</p>';
@@ -565,14 +511,12 @@
 
         // Initialize dashboard
         async function init() {
-            await loadStats();
             await loadReports();
             updateTimestamp();
         }
 
         // Auto-refresh every 60 seconds
         setInterval(() => {
-            loadStats();
             loadReports();
             if (currentLog) refreshLogs();
             updateTimestamp();

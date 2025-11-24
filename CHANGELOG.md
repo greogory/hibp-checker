@@ -5,6 +5,33 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.1] - 2025-11-24
+
+### Added
+- New utility scripts:
+  - `check-bitwarden-passwords.py` - Direct Bitwarden vault password checking
+  - `check-passwords.py` - Standalone password breach checker
+  - `verify-dns.sh` - DNS verification utility
+  - `launch-dashboard.sh` - Quick dashboard launcher
+- Dashboard archive template (`dashboard/templates/archive.html`)
+- Docker and GitHub release documentation
+
+### Changed
+- **Systemd Timer Improvements**:
+  - Changed default schedule from 3 AM to 2 AM
+  - Added `OnBootSec=15min` - runs 15 minutes after boot if scheduled time was missed
+  - Updated systemd service paths from `~/claude-archive/projects/hibp-project` to `/raid0/ClaudeCodeProjects/hibp-project`
+  - Fixed `ReadWritePaths` to use correct project location
+- Enhanced `.gitignore` to exclude release artifacts
+
+### Fixed
+- Systemd service template paths now reference correct project directory
+- Timer configuration more resilient to system downtime
+
+### Documentation
+- Added `DOCKER_PUBLISH_INSTRUCTIONS.md` for Docker image publishing workflow
+- Added `GITHUB_RELEASE_INSTRUCTIONS.md` for release creation process
+
 ## [2.0.0] - 2025-11-07
 
 ### 🎉 Major New Features

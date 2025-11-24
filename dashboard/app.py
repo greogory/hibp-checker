@@ -106,6 +106,11 @@ def index():
     """Main dashboard page"""
     return render_template('index.html')
 
+@app.route('/archive')
+def archive():
+    """Archive page with all reports"""
+    return render_template('archive.html')
+
 @app.route('/api/reports')
 def api_reports():
     """API endpoint to get all reports"""

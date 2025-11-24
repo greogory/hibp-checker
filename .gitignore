@@ -53,3 +53,9 @@ Thumbs.db
 # Temporary Files
 *.tmp
 .cache/
+
+# Release Artifacts
+hibp-checker-*.tar.gz
+hibp-checker-*.zip
+hibp-checker-*.sha256
+hibp_automation_workflow_*.tar.gz

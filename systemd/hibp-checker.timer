@@ -4,9 +4,11 @@ Documentation=https://github.com/greogory/hibp-checker
 Requires=hibp-checker.service
 
 [Timer]
-# Run daily at 3 AM
-OnCalendar=daily
-OnCalendar=*-*-* 03:00:00
+# Run daily at 2 AM
+OnCalendar=*-*-* 02:00:00
+
+# Run 15 minutes after boot if the 2 AM schedule was missed
+OnBootSec=15min
 
 # Run on boot if missed (e.g., computer was off)
 Persistent=yes
