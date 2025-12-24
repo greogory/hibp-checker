@@ -341,6 +341,105 @@
             font-size: 0.9em;
             margin-top: 20px;
         }
+
+        /* Bitwarden Tab Styles */
+        .status-banner {
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .status-banner.error {
+            background: #fed7d7;
+            color: #c53030;
+            border: 1px solid #fc8181;
+        }
+
+        .status-banner.warning {
+            background: #feebc8;
+            color: #c05621;
+            border: 1px solid #f6ad55;
+        }
+
+        .status-banner.success {
+            background: #c6f6d5;
+            color: #276749;
+            border: 1px solid #68d391;
+        }
+
+        .bw-controls {
+            display: flex;
+            align-items: center;
+        }
+
+        .progress-bar-container {
+            background: #e2e8f0;
+            border-radius: 8px;
+            height: 24px;
+            margin-bottom: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            height: 100%;
+            border-radius: 8px;
+            width: 0%;
+            transition: width 0.3s ease;
+            position: relative;
+        }
+
+        .progress-bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(
+                90deg,
+                transparent 0%,
+                rgba(255,255,255,0.3) 50%,
+                transparent 100%
+            );
+            animation: shimmer 1.5s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .progress-text {
+            text-align: center;
+            color: #718096;
+            font-size: 0.9em;
+        }
+
+        .bw-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+        }
+
+        .bw-results .stat-card {
+            padding: 20px;
+        }
+
+        .bw-results .stat-card h3 {
+            font-size: 0.8em;
+        }
+
+        .bw-results .stat-card .stat-value {
+            font-size: 2em;
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
     </style>
 </head>
 <body>
@@ -360,6 +459,7 @@
         <div class="tabs">
             <button class="tab active" data-tab="reports">📊 Reports</button>
             <button class="tab" data-tab="logs">📝 Logs</button>
+            <button class="tab" data-tab="bitwarden">🔐 Bitwarden</button>
         </div>
 
         <div id="reports" class="tab-content active">
@@ -388,6 +488,68 @@
                 </div>
                 <div id="logViewer" class="log-viewer">
                     Select a log file to view...
+                </div>
+            </div>
+        </div>
+
+        <div id="bitwarden" class="tab-content">
+            <div class="content-card">
+                <h2 style="margin-bottom: 20px; color: #2d3748;">Bitwarden Password Audit</h2>
+
+                <!-- Status Banner -->
+                <div id="bwStatusBanner" class="status-banner" style="display: none;"></div>
+
+                <!-- Action Controls -->
+                <div class="bw-controls" style="margin-bottom: 20px;">
+                    <button id="bwRunCheck" class="btn btn-primary" disabled>
+                        🔍 Run Password Check
+                    </button>
+                    <span id="bwCheckStatus" style="margin-left: 15px; color: #718096;"></span>
+                </div>
+
+                <!-- Progress Section (hidden by default) -->
+                <div id="bwProgress" class="bw-progress" style="display: none;">
+                    <div class="progress-bar-container">
+                        <div id="bwProgressBar" class="progress-bar"></div>
+                    </div>
+                    <div id="bwProgressText" class="progress-text">
+                        Checking passwords...
+                    </div>
+                </div>
+
+                <!-- Results Section -->
+                <div id="bwResults" class="bw-results" style="display: none;">
+                    <!-- Summary Stats -->
+                    <div class="bw-stats-grid">
+                        <div class="stat-card clean">
+                            <h3>Safe</h3>
+                            <div id="bwSafeCount" class="stat-value">0</div>
+                        </div>
+                        <div class="stat-card critical">
+                            <h3>Compromised</h3>
+                            <div id="bwCompromisedCount" class="stat-value">0</div>
+                        </div>
+                        <div class="stat-card" style="border-left: 4px solid #c53030;">
+                            <h3>Critical Risk</h3>
+                            <div id="bwCriticalCount" class="stat-value" style="color: #c53030;">0</div>
+                        </div>
+                        <div class="stat-card">
+                            <h3>Total Checked</h3>
+                            <div id="bwTotalCount" class="stat-value">0</div>
+                        </div>
+                    </div>
+
+                    <!-- Compromised Items List -->
+                    <h3 style="color: #2d3748; margin: 20px 0 15px;">Compromised Passwords</h3>
+                    <div id="bwCompromisedList" class="reports-list">
+                        <!-- Items will be populated here -->
+                    </div>
+                </div>
+
+                <!-- Latest Report Info -->
+                <div id="bwLatestReport" style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #e2e8f0;">
+                    <h3 style="color: #718096; font-size: 0.9em; margin-bottom: 10px;">Latest Check</h3>
+                    <div id="bwLatestInfo" style="color: #4a5568;">No previous checks found</div>
                 </div>
             </div>
         </div>
@@ -580,6 +742,206 @@
 
         // Load on page load
         init();
+
+        // ========================================
+        // Bitwarden Password Checker Functions
+        // ========================================
+        let bwCheckTaskId = null;
+        let bwCheckInterval = null;
+
+        async function loadBitwardenStatus() {
+            try {
+                const response = await fetch('/api/bitwarden/status');
+                const data = await response.json();
+
+                const banner = document.getElementById('bwStatusBanner');
+                const runBtn = document.getElementById('bwRunCheck');
+
+                if (!data.ready) {
+                    banner.style.display = 'block';
+                    banner.className = 'status-banner error';
+                    banner.innerHTML = `
+                        <strong>⚠️ Setup Required:</strong><br>
+                        ${data.prerequisites.errors.map(e => `• ${e}`).join('<br>')}
+                    `;
+                    runBtn.disabled = true;
+                } else {
+                    banner.style.display = 'none';
+                    runBtn.disabled = false;
+                }
+
+                // Show latest report info and results
+                if (data.latest_report && data.latest_report.summary) {
+                    const summary = data.latest_report.summary;
+                    document.getElementById('bwLatestInfo').innerHTML = `
+                        Last checked: ${new Date(data.latest_report.generated).toLocaleString()}<br>
+                        ${summary.total || 0} passwords checked, ${summary.compromised || 0} compromised
+                    `;
+
+                    // Fetch full report to display results
+                    const reportsResp = await fetch('/api/bitwarden/reports');
+                    const reportsData = await reportsResp.json();
+                    if (reportsData.reports && reportsData.reports.length > 0) {
+                        const latestFilename = reportsData.reports[0].filename;
+                        const reportResp = await fetch(`/api/bitwarden/report/${latestFilename}`);
+                        const fullReport = await reportResp.json();
+                        displayBitwardenResults(fullReport);
+                    }
+                } else {
+                    document.getElementById('bwLatestInfo').textContent = 'No previous checks found';
+                }
+            } catch (error) {
+                console.error('Error loading Bitwarden status:', error);
+            }
+        }
+
+        async function startBitwardenCheck() {
+            const runBtn = document.getElementById('bwRunCheck');
+            const progress = document.getElementById('bwProgress');
+            const statusText = document.getElementById('bwCheckStatus');
+
+            runBtn.disabled = true;
+            progress.style.display = 'block';
+            statusText.textContent = 'Starting check...';
+            document.getElementById('bwProgressBar').style.width = '0%';
+
+            try {
+                const response = await fetch('/api/bitwarden/check', { method: 'POST' });
+                const data = await response.json();
+
+                if (data.error) {
+                    statusText.textContent = `Error: ${data.error}`;
+                    runBtn.disabled = false;
+                    progress.style.display = 'none';
+                    return;
+                }
+
+                bwCheckTaskId = data.task_id;
+                statusText.textContent = 'Check in progress...';
+
+                // Poll for status every 2 seconds
+                bwCheckInterval = setInterval(pollBitwardenTask, 2000);
+
+            } catch (error) {
+                console.error('Error starting check:', error);
+                statusText.textContent = 'Failed to start check';
+                runBtn.disabled = false;
+                progress.style.display = 'none';
+            }
+        }
+
+        async function pollBitwardenTask() {
+            if (!bwCheckTaskId) return;
+
+            try {
+                const response = await fetch(`/api/bitwarden/task/${bwCheckTaskId}`);
+                const task = await response.json();
+
+                const progressBar = document.getElementById('bwProgressBar');
+                const progressText = document.getElementById('bwProgressText');
+                const statusText = document.getElementById('bwCheckStatus');
+
+                if (task.status === 'running') {
+                    // Show indeterminate progress with shimmer animation
+                    progressBar.style.width = '100%';
+                    progressText.textContent = 'Checking passwords against HIBP database...';
+                } else if (task.status === 'completed') {
+                    clearInterval(bwCheckInterval);
+                    bwCheckInterval = null;
+
+                    progressBar.style.width = '100%';
+                    progressText.textContent = '✓ Check complete!';
+                    statusText.textContent = '';
+
+                    // Display results
+                    if (task.result) {
+                        displayBitwardenResults(task.result);
+                    }
+
+                    // Re-enable button after delay
+                    setTimeout(() => {
+                        document.getElementById('bwRunCheck').disabled = false;
+                        document.getElementById('bwProgress').style.display = 'none';
+                        // Update latest info
+                        loadBitwardenStatus();
+                    }, 2000);
+
+                } else if (task.status === 'failed') {
+                    clearInterval(bwCheckInterval);
+                    bwCheckInterval = null;
+
+                    progressBar.style.width = '0%';
+                    progressText.textContent = `❌ Error: ${task.error}`;
+                    statusText.textContent = '';
+                    document.getElementById('bwRunCheck').disabled = false;
+
+                    setTimeout(() => {
+                        document.getElementById('bwProgress').style.display = 'none';
+                    }, 5000);
+                }
+
+            } catch (error) {
+                console.error('Error polling task:', error);
+            }
+        }
+
+        function displayBitwardenResults(data) {
+            if (!data || !data.summary) return;
+
+            const resultsDiv = document.getElementById('bwResults');
+            resultsDiv.style.display = 'block';
+
+            // Update summary stats
+            const summary = data.summary;
+            document.getElementById('bwSafeCount').textContent = summary.safe || 0;
+            document.getElementById('bwCompromisedCount').textContent = summary.compromised || 0;
+            document.getElementById('bwCriticalCount').textContent = summary.critical_count || 0;
+            document.getElementById('bwTotalCount').textContent = summary.total || 0;
+
+            // Build compromised items list
+            const items = data.items || [];
+            const compromisedItems = items.filter(item => item.status === 'compromised');
+
+            let listHtml;
+            if (compromisedItems.length === 0) {
+                listHtml = '<p style="color: #38a169; text-align: center; padding: 20px;">✓ All passwords are safe!</p>';
+            } else {
+                listHtml = compromisedItems
+                    .sort((a, b) => (b.breach_count || 0) - (a.breach_count || 0))
+                    .map(item => {
+                        const riskClass = item.risk_level === 'critical' ? 'critical' :
+                                          item.risk_level === 'high' ? 'warning' : '';
+                        return `
+                            <div class="report-item ${riskClass}">
+                                <div class="report-header">
+                                    <div class="report-title">${escapeHtml(item.name || 'Unknown')}</div>
+                                    <span class="badge ${riskClass || 'warning'}">${(item.risk_level || 'unknown').toUpperCase()}</span>
+                                </div>
+                                ${item.username ? `<div style="color: #718096; font-size: 0.9em;">User: ${escapeHtml(item.username)}</div>` : ''}
+                                ${item.uri ? `<div style="color: #718096; font-size: 0.9em;">URL: ${escapeHtml(item.uri)}</div>` : ''}
+                                <div style="color: #e53e3e; font-weight: 600; margin-top: 5px;">
+                                    Found ${(item.breach_count || 0).toLocaleString()} times in data breaches
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+            }
+
+            document.getElementById('bwCompromisedList').innerHTML = listHtml;
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Event listener for Run Check button
+        document.getElementById('bwRunCheck').addEventListener('click', startBitwardenCheck);
+
+        // Load Bitwarden status when tab is clicked
+        document.querySelector('[data-tab="bitwarden"]').addEventListener('click', loadBitwardenStatus);
     </script>
 </body>
 </html>

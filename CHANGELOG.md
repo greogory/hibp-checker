@@ -13,6 +13,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+## [2.2.0] - 2025-12-24
+
+### Added
+- **Bitwarden Password Audit in Dashboard**
+  - New "Bitwarden" tab in web UI for password health checks
+  - "Run Password Check" button to trigger `bw-hibp-stream.py`
+  - Real-time progress indicator with shimmer animation
+  - Results display with summary stats (Safe, Compromised, Critical, Total)
+  - Compromised passwords list sorted by breach count with risk badges
+  - Historical report storage (last 10 checks preserved)
+  - Prerequisites check with helpful error messages
+
+### Technical
+- New `bitwarden_checker.py` module for subprocess management and task tracking
+- 5 new API endpoints for Bitwarden integration:
+  - `GET /api/bitwarden/status` - Check prerequisites
+  - `POST /api/bitwarden/check` - Start password check
+  - `GET /api/bitwarden/task/<id>` - Poll task status
+  - `GET /api/bitwarden/reports` - List saved reports
+  - `GET /api/bitwarden/report/<filename>` - Get report details
+
 ## [2.1.0] - 2025-12-24
 
 ### Added

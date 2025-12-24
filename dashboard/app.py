@@ -4,12 +4,14 @@ HIBP Dashboard - Web Interface for Breach Reports
 A local Flask-based dashboard to view HIBP breach reports and logs
 """
 
-from flask import Flask, render_template, jsonify, send_file
+from flask import Flask, render_template, jsonify, send_file, request
 import os
 import json
 import glob
 from datetime import datetime
 from pathlib import Path
+
+from bitwarden_checker import BitwardenChecker
 
 app = Flask(__name__)
 
@@ -18,6 +20,9 @@ BASE_DIR = Path(__file__).parent.parent
 REPORTS_DIR = BASE_DIR / 'reports'
 LOGS_DIR = BASE_DIR / 'logs'
 SYSTEMD_LOG_DIR = Path.home() / '.local/share/hibp-checker'
+
+# Initialize Bitwarden checker
+bitwarden_checker = BitwardenChecker(BASE_DIR)
 
 def parse_text_report(filepath):
     """Parse a text-based HIBP report"""
@@ -192,6 +197,70 @@ def download_report(filename):
     if filepath.exists():
         return send_file(filepath, as_attachment=True)
     return "File not found", 404
+
+
+# Bitwarden HIBP Password Checker API Endpoints
+
+@app.route('/api/bitwarden/status')
+def api_bitwarden_status():
+    """Check if Bitwarden integration is ready."""
+    prereqs = bitwarden_checker.check_prerequisites()
+    latest_report = bitwarden_checker.get_latest_report()
+
+    return jsonify({
+        'prerequisites': prereqs,
+        'ready': all([
+            prereqs['bw_installed'],
+            prereqs['bw_session_set'],
+            prereqs['vault_unlocked']
+        ]),
+        'latest_report': {
+            'generated': latest_report.get('generated'),
+            'summary': latest_report.get('summary')
+        } if latest_report else None
+    })
+
+
+@app.route('/api/bitwarden/check', methods=['POST'])
+def api_bitwarden_check():
+    """Start a new Bitwarden password check."""
+    prereqs = bitwarden_checker.check_prerequisites()
+
+    if not prereqs['bw_session_set']:
+        return jsonify({'error': 'BW_SESSION environment variable not set'}), 400
+    if not prereqs['bw_installed']:
+        return jsonify({'error': 'Bitwarden CLI not installed'}), 400
+    if not prereqs['vault_unlocked']:
+        return jsonify({'error': 'Bitwarden vault is locked'}), 400
+
+    task_id = bitwarden_checker.start_check()
+    return jsonify({'task_id': task_id, 'status': 'started'})
+
+
+@app.route('/api/bitwarden/task/<task_id>')
+def api_bitwarden_task_status(task_id):
+    """Get status of a running password check."""
+    status = bitwarden_checker.get_task_status(task_id)
+    if status:
+        return jsonify(status)
+    return jsonify({'error': 'Task not found'}), 404
+
+
+@app.route('/api/bitwarden/reports')
+def api_bitwarden_reports():
+    """Get list of all Bitwarden HIBP reports."""
+    reports = bitwarden_checker.get_all_reports()
+    return jsonify({'reports': reports})
+
+
+@app.route('/api/bitwarden/report/<filename>')
+def api_bitwarden_report_detail(filename):
+    """Get detailed Bitwarden HIBP report."""
+    report = bitwarden_checker.get_report_by_filename(filename)
+    if report:
+        return jsonify(report)
+    return jsonify({'error': 'Report not found'}), 404
+
 
 if __name__ == '__main__':
     # Run on localhost only for security
