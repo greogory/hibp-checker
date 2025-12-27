@@ -62,3 +62,4 @@ hibp_automation_workflow_*.tar.gz
 
 # Session Files
 exit.*
+.exit*
