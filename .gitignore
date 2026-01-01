@@ -69,3 +69,9 @@ exit.*
 
 # Ruff cache
 .ruff_cache/
+
+# Database snapshots
+.snapshots/
+
+# Claude Code instructions (local only)
+CLAUDE.md
