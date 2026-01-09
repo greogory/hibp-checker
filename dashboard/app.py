@@ -4,15 +4,59 @@ HIBP Dashboard - Web Interface for Breach Reports
 A local Flask-based dashboard to view HIBP breach reports and logs
 """
 
-from flask import Flask, render_template, jsonify, send_file
+from flask import Flask, render_template, jsonify, send_file, abort
 import os
 import glob
+import logging
 from datetime import datetime
 from pathlib import Path
 
 from bitwarden_checker import BitwardenChecker
 
 app = Flask(__name__)
+
+# Configure logging to avoid exposing sensitive info
+logging.basicConfig(level=logging.WARNING)
+logger = logging.getLogger(__name__)
+
+
+def sanitize_filename(filename: str) -> str:
+    """
+    Sanitize a filename to prevent path traversal attacks.
+    Only allows alphanumeric characters, underscores, hyphens, and dots.
+    """
+    if not filename:
+        return ""
+    # Remove any path components - only keep the basename
+    basename = os.path.basename(filename)
+    # Validate characters: only allow safe filename characters
+    safe_chars = set('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_-.')
+    if not all(c in safe_chars for c in basename):
+        return ""
+    # Prevent hidden files and double extensions that could be exploited
+    if basename.startswith('.') or '..' in basename:
+        return ""
+    return basename
+
+
+def safe_path_join(base_dir: Path, filename: str) -> Path | None:
+    """
+    Safely join a base directory with a filename, preventing path traversal.
+    Returns None if the resulting path would be outside base_dir.
+    """
+    sanitized = sanitize_filename(filename)
+    if not sanitized:
+        return None
+
+    full_path = (base_dir / sanitized).resolve()
+    base_resolved = base_dir.resolve()
+
+    # Verify the resolved path is under the base directory
+    try:
+        full_path.relative_to(base_resolved)
+        return full_path
+    except ValueError:
+        return None
 
 # Configuration
 BASE_DIR = Path(__file__).parent.parent
@@ -75,9 +119,11 @@ def parse_text_report(filepath):
 
         return summary
     except Exception as e:
+        # Log the actual error internally, but don't expose details to users
+        logger.error("Error parsing report %s: %s", os.path.basename(filepath), e)
         return {
             'filename': os.path.basename(filepath),
-            'error': str(e),
+            'error': 'Failed to parse report file',
             'severity': 'error'
         }
 
@@ -121,14 +167,18 @@ def get_log_content(log_type='workflow'):
     }
 
     log_file = log_files.get(log_type)
-    if log_file and log_file.exists():
+    if not log_file:
+        return "Invalid log type"
+    if log_file.exists():
         try:
             with open(log_file, 'r') as f:
                 # Get last 500 lines
                 lines = f.readlines()
                 return ''.join(lines[-500:])
         except Exception as e:
-            return f"Error reading log: {str(e)}"
+            # Log the actual error internally, but don't expose details
+            logger.error("Error reading log %s: %s", log_type, e)
+            return "Error reading log file"
     return "Log file not found"
 
 @app.route('/')
@@ -163,7 +213,9 @@ def api_reports():
 @app.route('/api/report/<filename>')
 def api_report_detail(filename):
     """API endpoint to get detailed report"""
-    filepath = REPORTS_DIR / filename
+    filepath = safe_path_join(REPORTS_DIR, filename)
+    if filepath is None:
+        abort(400, description="Invalid filename")
     if filepath.exists():
         report = parse_text_report(filepath)
         return jsonify(report)
@@ -237,10 +289,12 @@ def api_stats():
 @app.route('/download/<filename>')
 def download_report(filename):
     """Download a report file"""
-    filepath = REPORTS_DIR / filename
+    filepath = safe_path_join(REPORTS_DIR, filename)
+    if filepath is None:
+        abort(400, description="Invalid filename")
     if filepath.exists():
         return send_file(filepath, as_attachment=True)
-    return "File not found", 404
+    abort(404, description="File not found")
 
 
 # Bitwarden HIBP Password Checker API Endpoints

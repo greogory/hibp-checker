@@ -3,6 +3,12 @@
 HIBP Pwned Passwords Checker
 Securely checks passwords against the Have I Been Pwned database
 Uses k-anonymity - only sends first 5 characters of SHA-1 hash
+
+Security notes:
+- Passwords are NEVER logged, stored, or transmitted in plaintext
+- Only SHA-1 hashes are computed locally
+- Only the first 5 characters of the hash are sent to HIBP (k-anonymity)
+- Output shows only breach counts, never the passwords themselves
 """
 
 import hashlib

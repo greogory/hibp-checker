@@ -4,6 +4,7 @@ Bitwarden Password Checker for HIBP
 Reads Bitwarden JSON export and checks all passwords against HIBP
 """
 
+import argparse
 import json
 import hashlib
 import requests
@@ -11,6 +12,10 @@ import sys
 import time
 from typing import Tuple, List, Dict
 from pathlib import Path
+
+# Security note: This tool intentionally displays account names and optionally
+# usernames to help users identify which credentials need to be changed.
+# Use --quiet mode to suppress account details in output.
 
 def check_password(password: str) -> Tuple[bool, int]:
     """
@@ -88,14 +93,30 @@ def parse_bitwarden_json(file_path: str) -> List[Dict]:
 
 def main():
     """Main function."""
+    parser = argparse.ArgumentParser(
+        description="Check Bitwarden passwords against HIBP database"
+    )
+    parser.add_argument("file", nargs="?", help="Path to Bitwarden JSON export")
+    parser.add_argument(
+        "-q", "--quiet",
+        action="store_true",
+        help="Suppress account details in output (security mode)"
+    )
+    parser.add_argument(
+        "-v", "--verbose",
+        action="store_true",
+        help="Show usernames in output"
+    )
+    args = parser.parse_args()
+
     print("=" * 80)
     print("Bitwarden Password Checker for HIBP")
     print("=" * 80)
     print()
 
     # Get file path from command line or prompt
-    if len(sys.argv) > 1:
-        json_file = sys.argv[1]
+    if args.file:
+        json_file = args.file
     else:
         json_file = input("Enter path to Bitwarden JSON export: ").strip()
 
@@ -135,11 +156,14 @@ def main():
         username = item.get('login', {}).get('username', '')
         password = item.get('login', {}).get('password', '')
 
-        # Display progress
-        print(f"[{i}/{total}] {name}", end='')
-        if username:
-            print(f" ({username})", end='')
-        print("... ", end='', flush=True)
+        # Display progress (respect quiet mode)
+        if args.quiet:
+            print(f"[{i}/{total}] Checking... ", end='', flush=True)
+        else:
+            print(f"[{i}/{total}] {name}", end='')
+            if args.verbose and username:
+                print(f" ({username})", end='')
+            print("... ", end='', flush=True)
 
         # Check password
         is_pwned, count = check_password(password)
@@ -176,15 +200,19 @@ def main():
         print(f"  Errors:                {errors}")
     print()
 
-    # Show critical items
+    # Show critical items (respect quiet mode)
     if critical:
         print("\033[1;31m⚠ CRITICAL - Change these immediately:\033[0m")
         print("-" * 80)
-        for item in sorted(critical, key=lambda x: x['count'], reverse=True):
-            print(f"  • {item['name']}")
-            if item['username']:
-                print(f"    Username: {item['username']}")
-            print(f"    Found {item['count']:,} times in breaches")
+        if args.quiet:
+            print(f"  {len(critical)} critical account(s) need immediate password changes.")
+            print("  Run without --quiet to see account details.")
+        else:
+            for item in sorted(critical, key=lambda x: x['count'], reverse=True):
+                print(f"  • {item['name']}")
+                if args.verbose and item['username']:
+                    print(f"    Username: {item['username']}")
+                print(f"    Found {item['count']:,} times in breaches")
         print()
 
     # Recommendations
