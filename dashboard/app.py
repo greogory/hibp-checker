@@ -48,15 +48,27 @@ def safe_path_join(base_dir: Path, filename: str) -> Path | None:
     if not sanitized:
         return None
 
-    full_path = (base_dir / sanitized).resolve()
+    # Resolve base directory first (trusted path)
     base_resolved = base_dir.resolve()
 
-    # Verify the resolved path is under the base directory
-    try:
-        full_path.relative_to(base_resolved)
-        return full_path
-    except ValueError:
-        return None
+    # Build path using only the sanitized basename (no path components)
+    # This is safe because sanitize_filename() strips all path components
+    # and only allows alphanumeric, underscore, hyphen, and dot characters
+    full_path = base_resolved / sanitized
+
+    # Double-check: verify the file exists and is within base directory
+    # Use realpath on the final path to catch any symlink-based attacks
+    if full_path.exists():
+        real_path = Path(os.path.realpath(full_path))
+        try:
+            real_path.relative_to(base_resolved)
+            return real_path
+        except ValueError:
+            return None
+
+    # For non-existent files, just return the constructed path
+    # (already validated by sanitize_filename)
+    return full_path
 
 # Configuration
 BASE_DIR = Path(__file__).parent.parent
@@ -71,17 +83,35 @@ SYSTEMD_LOG_DIR = HIBP_DATA_DIR
 bitwarden_checker = BitwardenChecker(BASE_DIR)
 
 def parse_text_report(filepath):
-    """Parse a text-based HIBP report"""
+    """Parse a text-based HIBP report.
+
+    Args:
+        filepath: Path to report file (must be within REPORTS_DIR)
+    """
+    # Validate filepath is within expected directory to prevent path traversal
+    # Convert to real path to resolve any symlinks
+    real_path = Path(os.path.realpath(filepath))
+    reports_resolved = REPORTS_DIR.resolve()
     try:
-        with open(filepath, 'r') as f:
+        real_path.relative_to(reports_resolved)
+    except ValueError:
+        logger.warning("Attempted access to file outside reports directory")
+        return {
+            'filename': 'invalid',
+            'error': 'Access denied',
+            'severity': 'error'
+        }
+
+    try:
+        with open(real_path, 'r') as f:
             content = f.read()
 
         # Extract summary data
         summary = {
-            'filename': os.path.basename(filepath),
-            'filepath': str(filepath),
-            'timestamp': datetime.fromtimestamp(os.path.getmtime(filepath)).isoformat(),
-            'size': os.path.getsize(filepath),
+            'filename': real_path.name,
+            'filepath': str(real_path),
+            'timestamp': datetime.fromtimestamp(real_path.stat().st_mtime).isoformat(),
+            'size': real_path.stat().st_size,
             'total_breaches': 0,
             'password_exposures': 0,
             'stealer_logs': 0,
@@ -120,9 +150,9 @@ def parse_text_report(filepath):
         return summary
     except Exception as e:
         # Log the actual error internally, but don't expose details to users
-        logger.error("Error parsing report %s: %s", os.path.basename(filepath), e)
+        logger.error("Error parsing report %s: %s", real_path.name, e)
         return {
-            'filename': os.path.basename(filepath),
+            'filename': real_path.name,
             'error': 'Failed to parse report file',
             'severity': 'error'
         }
@@ -288,13 +318,20 @@ def api_stats():
 
 @app.route('/download/<filename>')
 def download_report(filename):
-    """Download a report file"""
+    """Download a report file.
+
+    Security: filepath is validated by safe_path_join() which:
+    1. Sanitizes filename (alphanumeric, underscore, hyphen, dot only)
+    2. Uses os.path.realpath() to resolve symlinks
+    3. Validates path is within REPORTS_DIR
+    """
     filepath = safe_path_join(REPORTS_DIR, filename)
     if filepath is None:
         abort(400, description="Invalid filename")
-    if filepath.exists():
-        return send_file(filepath, as_attachment=True)
-    abort(404, description="File not found")
+    if not filepath.exists():
+        abort(404, description="File not found")
+    # Path has been validated by safe_path_join - safe to serve
+    return send_file(str(filepath), as_attachment=True)
 
 
 # Bitwarden HIBP Password Checker API Endpoints

@@ -4,8 +4,8 @@
 
 ✅ **Docker image built successfully**
 - Image ID: `bd230267d7ab`
-- Tags: `ghcr.io/greogory/hibp-checker:2.0.0`, `ghcr.io/greogory/hibp-checker:latest`
-- Includes: Dashboard, Flask, all v2.0.0 features
+- Tags: `ghcr.io/greogory/hibp-checker:2.3.0`, `ghcr.io/greogory/hibp-checker:latest`
+- Includes: Dashboard, Flask, all v2.3.0 features
 - Size: ~300 MB (Python 3.11-slim base)
 
 ❌ **Push failed** - Token requires `write:packages` scope
@@ -31,8 +31,8 @@
    ```bash
    cd <project-directory>
 
-   # Push v2.0.0 tag
-   docker push ghcr.io/greogory/hibp-checker:2.0.0
+   # Push v2.3.0 tag
+   docker push ghcr.io/greogory/hibp-checker:2.3.0
 
    # Push latest tag
    docker push ghcr.io/greogory/hibp-checker:latest
@@ -58,14 +58,14 @@ If you've lost the local image:
 cd <project-directory>
 
 # Rebuild
-docker build -t ghcr.io/greogory/hibp-checker:2.0.0 \
+docker build -t ghcr.io/greogory/hibp-checker:2.3.0 \
              -t ghcr.io/greogory/hibp-checker:latest .
 
 # Login with proper token
 echo "YOUR_TOKEN" | docker login ghcr.io -u greogory --password-stdin
 
 # Push
-docker push ghcr.io/greogory/hibp-checker:2.0.0
+docker push ghcr.io/greogory/hibp-checker:2.3.0
 docker push ghcr.io/greogory/hibp-checker:latest
 ```
 
@@ -75,15 +75,15 @@ After pushing, verify the image is available:
 
 ```bash
 # Pull the image
-docker pull ghcr.io/greogory/hibp-checker:2.0.0
+docker pull ghcr.io/greogory/hibp-checker:2.3.0
 
 # Check it works
-docker run --rm ghcr.io/greogory/hibp-checker:2.0.0 python3 --version
+docker run --rm ghcr.io/greogory/hibp-checker:2.3.0 python3 --version
 
 # Test dashboard
 docker run --rm -p 5000:5000 \
   -v $(pwd)/reports:/app/reports:ro \
-  ghcr.io/greogory/hibp-checker:2.0.0 \
+  ghcr.io/greogory/hibp-checker:2.3.0 \
   python3 dashboard/app.py
 ```
 
@@ -106,7 +106,7 @@ docker buildx create --name multiplatform --use
 # Build and push multi-platform
 docker buildx build \
   --platform linux/amd64,linux/arm64 \
-  -t ghcr.io/greogory/hibp-checker:2.0.0 \
+  -t ghcr.io/greogory/hibp-checker:2.3.0 \
   -t ghcr.io/greogory/hibp-checker:latest \
   --push \
   .
@@ -126,7 +126,7 @@ docker-compose --profile dashboard up -d
 # Run a check
 docker run --rm \
   -e HIBP_API_KEY="your-key" \
-  ghcr.io/greogory/hibp-checker:2.0.0 \
+  ghcr.io/greogory/hibp-checker:2.3.0 \
   python3 hibp_comprehensive_checker.py -e test@example.com
 ```
 
@@ -151,7 +151,7 @@ docker run --rm \
 
 ```
 Repository: ghcr.io/greogory/hibp-checker
-Tags: 2.0.0, latest
+Tags: 2.3.0, latest
 Base: python:3.11-slim
 Architecture: linux/amd64
 Contents:
@@ -166,7 +166,7 @@ Contents:
 
 1. Create PAT with `write:packages` scope
 2. Login to GHCR with the token
-3. Push both tags (2.0.0 and latest)
+3. Push both tags (2.3.0 and latest)
 4. Verify images are available
 5. Update package visibility to public
 6. Test pulling and running
@@ -174,6 +174,6 @@ Contents:
 ---
 
 **Built**: November 8, 2025
-**Version**: 2.0.0
+**Version**: 2.3.0
 **Status**: ✅ Built locally, ⏳ Awaiting publish
 **Action Required**: Token with `write:packages` scope needed

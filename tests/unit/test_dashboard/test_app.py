@@ -23,14 +23,42 @@ sys.path.insert(0, str(PROJECT_ROOT / 'dashboard'))
 class TestParseTextReport:
     """Tests for the parse_text_report() function."""
 
-    def test_parse_valid_report(self, temp_report_file):
+    def test_parse_valid_report(self, temp_dir):
         """Test parsing a valid HIBP report."""
         # Import here to avoid import errors before path setup
         from dashboard.app import parse_text_report
 
-        result = parse_text_report(str(temp_report_file))
+        # Create report in temp_dir and patch REPORTS_DIR to match
+        report_content = """HIBP COMPREHENSIVE BREACH REPORT
+Generated: 2024-01-15T10:30:00
+============================================================
 
-        assert result['filename'] == temp_report_file.name
+SUMMARY
+------------------------------
+Total Breaches: 5
+Password Exposures: 2
+Stealer Log Hits: 1
+Critical Sites Compromised: 1
+Paste Exposures: 3
+
+EMAIL: test@example.com
+------------------------------
+Total Breaches: 5
+
+Password Exposed In:
+  - Adobe (2013-10-04) - Type: plaintext
+  - LinkedIn (2016-05-18) - Type: sha1_hash
+
+============================================================
+"""
+        report_file = temp_dir / "hibp_report_20240115_103000.txt"
+        report_file.write_text(report_content)
+
+        # Patch REPORTS_DIR to allow files in temp_dir
+        with patch('dashboard.app.REPORTS_DIR', temp_dir):
+            result = parse_text_report(str(report_file))
+
+        assert result['filename'] == report_file.name
         assert result['total_breaches'] == 5
         assert result['password_exposures'] == 2
         assert result['stealer_logs'] == 1
@@ -49,7 +77,8 @@ Total Breaches: 10
         report_file = temp_dir / "critical_report.txt"
         report_file.write_text(report_content)
 
-        result = parse_text_report(str(report_file))
+        with patch('dashboard.app.REPORTS_DIR', temp_dir):
+            result = parse_text_report(str(report_file))
 
         assert result['severity'] == 'critical'
 
@@ -65,7 +94,8 @@ Total Breaches: 5
         report_file = temp_dir / "warning_report.txt"
         report_file.write_text(report_content)
 
-        result = parse_text_report(str(report_file))
+        with patch('dashboard.app.REPORTS_DIR', temp_dir):
+            result = parse_text_report(str(report_file))
 
         assert result['severity'] == 'warning'
 
@@ -81,25 +111,34 @@ Total Breaches: 0
         report_file = temp_dir / "clean_report.txt"
         report_file.write_text(report_content)
 
-        result = parse_text_report(str(report_file))
+        with patch('dashboard.app.REPORTS_DIR', temp_dir):
+            result = parse_text_report(str(report_file))
 
         assert result['severity'] == 'clean'
 
     def test_parse_report_error_handling(self, temp_dir):
-        """Test error handling for unreadable files."""
+        """Test error handling for files outside allowed directory."""
         from dashboard.app import parse_text_report
 
-        # Non-existent file
+        # File outside REPORTS_DIR should be rejected
         result = parse_text_report("/nonexistent/file.txt")
 
         assert 'error' in result
         assert result['severity'] == 'error'
 
-    def test_parse_report_extracts_content(self, temp_report_file):
+    def test_parse_report_extracts_content(self, temp_dir):
         """Test that full content is included."""
         from dashboard.app import parse_text_report
 
-        result = parse_text_report(str(temp_report_file))
+        report_content = """HIBP COMPREHENSIVE BREACH REPORT
+Generated: 2024-01-15T10:30:00
+============================================================
+"""
+        report_file = temp_dir / "test_report.txt"
+        report_file.write_text(report_content)
+
+        with patch('dashboard.app.REPORTS_DIR', temp_dir):
+            result = parse_text_report(str(report_file))
 
         assert 'content' in result
         assert 'HIBP COMPREHENSIVE BREACH REPORT' in result['content']

@@ -30,7 +30,8 @@ def check_password(password: str) -> Tuple[bool, int]:
         - count: Number of times password appears in breaches
     """
     # Hash the password with SHA-1
-    sha1_hash = hashlib.sha1(password.encode('utf-8')).hexdigest().upper()
+    # SHA1 is required by HIBP API protocol, not used for security purposes
+    sha1_hash = hashlib.sha1(password.encode('utf-8'), usedforsecurity=False).hexdigest().upper()
 
     # Split hash into prefix (first 5 chars) and suffix (rest)
     prefix = sha1_hash[:5]

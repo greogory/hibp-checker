@@ -17,6 +17,27 @@ from pathlib import Path
 # usernames to help users identify which credentials need to be changed.
 # Use --quiet mode to suppress account details in output.
 
+
+def redact_sensitive(value: str, show_chars: int = 4) -> str:
+    """Partially redact sensitive data for safer display.
+
+    Shows first few characters to help identify the account while
+    redacting the rest. This reduces log exposure while maintaining utility.
+
+    Args:
+        value: The sensitive string to redact
+        show_chars: Number of characters to show (default 4)
+
+    Returns:
+        Partially redacted string like "exam***"
+    """
+    if not value:
+        return "[empty]"
+    if len(value) <= show_chars:
+        return value[0] + "*" * (len(value) - 1)
+    return value[:show_chars] + "*" * min(3, len(value) - show_chars)
+
+
 def check_password(password: str) -> Tuple[bool, int]:
     """
     Check if a password has been pwned using HIBP API.
@@ -26,7 +47,8 @@ def check_password(password: str) -> Tuple[bool, int]:
         return False, 0
 
     # Hash the password with SHA-1
-    sha1_hash = hashlib.sha1(password.encode('utf-8')).hexdigest().upper()
+    # SHA1 is required by HIBP API protocol, not used for security purposes
+    sha1_hash = hashlib.sha1(password.encode('utf-8'), usedforsecurity=False).hexdigest().upper()
     prefix = sha1_hash[:5]
     suffix = sha1_hash[5:]
 
@@ -209,9 +231,10 @@ def main():
             print("  Run without --quiet to see account details.")
         else:
             for item in sorted(critical, key=lambda x: x['count'], reverse=True):
-                print(f"  • {item['name']}")
+                # Redact sensitive account info to reduce log exposure
+                print(f"  • {redact_sensitive(item['name'], 6)}")
                 if args.verbose and item['username']:
-                    print(f"    Username: {item['username']}")
+                    print(f"    Username: {redact_sensitive(item['username'], 4)}")
                 print(f"    Found {item['count']:,} times in breaches")
         print()
 

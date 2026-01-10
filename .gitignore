@@ -283,6 +283,10 @@ htmlcov/
 nosetests.xml
 test-results/
 junit*.xml
+test-report.md
+test-results.json
+PHASE*_COVERAGE_*.md
+PHASE*_COVERAGE_*.txt
 
 # -----------------------------------------------------------------------------
 # TEMPORARY & CACHE

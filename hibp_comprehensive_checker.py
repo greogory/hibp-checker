@@ -57,7 +57,7 @@ class HIBPChecker:
 
         try:
             self.log(f"Querying: {endpoint}")
-            response = requests.get(url, headers=self.headers, params=params)
+            response = requests.get(url, headers=self.headers, params=params, timeout=30)
 
             if response.status_code == 200:
                 return response.json()
@@ -228,14 +228,16 @@ class HIBPChecker:
         self.log("Checking password against Pwned Passwords database")
 
         # Generate SHA-1 hash
-        sha1 = hashlib.sha1(password.encode('utf-8')).hexdigest().upper()
+        # SHA1 is required by HIBP API protocol, not used for security purposes
+        sha1 = hashlib.sha1(password.encode('utf-8'), usedforsecurity=False).hexdigest().upper()
         prefix = sha1[:5]
         suffix = sha1[5:]
 
         try:
             response = requests.get(
                 f"{self.pwned_pw_url}/{prefix}",
-                headers={"user-agent": self.headers["user-agent"]}
+                headers={"user-agent": self.headers["user-agent"]},
+                timeout=30
             )
 
             if response.status_code == 200:

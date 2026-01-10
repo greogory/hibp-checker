@@ -71,7 +71,8 @@ def check_password_hibp(password: str) -> tuple[bool, int, Optional[str]]:
     except ImportError:
         return False, -1, "requests library not installed"
 
-    sha1_hash = hashlib.sha1(password.encode('utf-8')).hexdigest().upper()
+    # SHA1 is required by HIBP API protocol, not used for security purposes
+    sha1_hash = hashlib.sha1(password.encode('utf-8'), usedforsecurity=False).hexdigest().upper()
     prefix = sha1_hash[:5]
     suffix = sha1_hash[5:]
 

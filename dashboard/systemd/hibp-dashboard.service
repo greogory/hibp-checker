@@ -20,9 +20,11 @@ RestartSec=5
 StandardOutput=append:%h/.local/share/hibp-checker/dashboard.log
 StandardError=append:%h/.local/share/hibp-checker/dashboard.error.log
 
-# Security
-PrivateTmp=yes
+# Security hardening (match hibp-checker.service)
+ProtectSystem=strict
+ProtectHome=read-only
 NoNewPrivileges=yes
+PrivateTmp=yes
 
 [Install]
 WantedBy=default.target
