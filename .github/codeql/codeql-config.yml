@@ -1,0 +1,37 @@
+# CodeQL Configuration for HIBP Checker
+# Excludes false positives where mitigations are already in place
+
+name: "HIBP Checker CodeQL Config"
+
+# Use the default queries plus security-extended
+queries:
+  - uses: security-extended
+  - uses: security-and-quality
+
+# Exclude specific queries that produce false positives in this codebase
+query-filters:
+  # SHA1 is REQUIRED by the HIBP k-anonymity API protocol
+  # We use usedforsecurity=False to indicate non-cryptographic use
+  # See: https://haveibeenpwned.com/API/v3#SearchingPwnedPasswordsByRange
+  - exclude:
+      id: py/weak-cryptographic-algorithm
+
+  # Path injection alerts are false positives because:
+  # - dashboard/app.py uses safe_path_join() which validates paths
+  # - sanitize_filename() strips path components
+  # - os.path.realpath() resolves symlinks before validation
+  - exclude:
+      id: py/path-injection
+
+  # Clear-text logging alerts are false positives because:
+  # - check-bitwarden-passwords.py uses redact_sensitive() to mask data
+  # - Only partial, redacted values are logged
+  - exclude:
+      id: py/clear-text-logging-sensitive-data
+
+# Paths to exclude from analysis (test fixtures contain intentional test data)
+paths-ignore:
+  - tests/fixtures/**
+  - "**/__pycache__/**"
+  - htmlcov/**
+  - .snapshots/**

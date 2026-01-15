@@ -14,7 +14,7 @@ LABEL org.opencontainers.image.authors="Bosco <gjbr@pm.me>"
 LABEL org.opencontainers.image.source="https://github.com/greogory/hibp-checker"
 LABEL org.opencontainers.image.licenses="MIT"
 LABEL org.opencontainers.image.documentation="https://github.com/greogory/hibp-checker/blob/main/README.md"
-LABEL org.opencontainers.image.version="2.3.1"
+LABEL org.opencontainers.image.version="2.3.2.2"
 
 # Install bash and other required tools
 RUN apt-get update && \
