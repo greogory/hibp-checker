@@ -2,7 +2,8 @@
 
 | Version | Status | Release |
 |---------|--------|---------|
-| ![2](https://img.shields.io/badge/2-brightgreen)![3](https://img.shields.io/badge/3-darkgreen)![2](https://img.shields.io/badge/2-green)![2](https://img.shields.io/badge/2-yellow) | Latest tweak | [v2.3.2.2](https://github.com/greogory/hibp-checker/releases/tag/v2.3.2.2) |
+| ![2](https://img.shields.io/badge/2-brightgreen)![3](https://img.shields.io/badge/3-darkgreen)![3](https://img.shields.io/badge/3-green) | Latest patch | [v2.3.3](https://github.com/greogory/hibp-checker/releases/tag/v2.3.3) |
+| ![2](https://img.shields.io/badge/2-brightred)![3](https://img.shields.io/badge/3-darkred)![2](https://img.shields.io/badge/2-red)![2](https://img.shields.io/badge/2-orange) | Prior tweak | [v2.3.2.2](https://github.com/greogory/hibp-checker/releases/tag/v2.3.2.2) |
 | ![2](https://img.shields.io/badge/2-brightred)![3](https://img.shields.io/badge/3-darkred)![2](https://img.shields.io/badge/2-red)![1](https://img.shields.io/badge/1-orange) | Prior tweak | [v2.3.2.1](https://github.com/greogory/hibp-checker/releases/tag/v2.3.2.1) |
 | ![2](https://img.shields.io/badge/2-brightred)![3](https://img.shields.io/badge/3-darkred)![2](https://img.shields.io/badge/2-red) | Prior patch | [v2.3.2](https://github.com/greogory/hibp-checker/releases/tag/v2.3.2) |
 

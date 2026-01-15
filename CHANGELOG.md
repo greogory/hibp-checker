@@ -13,6 +13,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+## [2.3.3] - 2026-01-14
+
+### Added
+- CodeQL exclusion config (`.github/codeql/codeql-config.yml`) to suppress false positive alerts:
+  - `py/weak-cryptographic-algorithm` - SHA1 required by HIBP API protocol
+  - `py/path-injection` - `safe_path_join()` validation exists
+  - `py/clear-text-logging-sensitive-data` - `redact_sensitive()` in use
+
+### Changed
+- Synced all documentation version references to 2.3.2.2
+- Updated Dockerfile version label
+- Updated DOCKER.md and DOCKER_PUBLISH_INSTRUCTIONS.md
+
 ## [2.3.2.2] - 2026-01-13
 
 ### Changed
