@@ -276,6 +276,82 @@ When reviewing PRs:
 - [ ] Run code locally before merging
 - [ ] Verify documentation accuracy
 
+## Security Audit Tools
+
+This project uses the following installed tools for comprehensive security auditing:
+
+### Python Code (76 files)
+
+| Tool | Purpose | Command |
+|------|---------|---------|
+| **bandit** | Security-focused static analysis | `bandit -r . -x ./snapshots,./venv` |
+| **pip-audit** | Python dependency vulnerability scanner | `pip-audit` |
+| **ruff** | Fast Python linter (security rules) | `ruff check .` |
+| **mypy** | Static type checking | `mypy --ignore-missing-imports .` |
+| **pylint** | Code quality and error detection | `pylint --disable=C,R *.py` |
+
+### Shell Scripts (44 files)
+
+| Tool | Purpose | Command |
+|------|---------|---------|
+| **shellcheck** | Static analysis for shell scripts | `shellcheck bin/*.sh scripts/*.sh` |
+| **shfmt** | Shell script formatting validation | `shfmt -d bin/*.sh` |
+
+### Docker/Container (4 Dockerfiles)
+
+| Tool | Purpose | Command |
+|------|---------|---------|
+| **hadolint** | Dockerfile linter | `hadolint Dockerfile` |
+| **trivy** | Container vulnerability scanner | `trivy image <image-name>` |
+| **grype** | Container/filesystem vulnerability scanner | `grype dir:.` |
+
+### Configuration Files (40 YAML files)
+
+| Tool | Purpose | Command |
+|------|---------|---------|
+| **yamllint** | YAML linting | `yamllint .github/workflows/` |
+
+### Documentation
+
+| Tool | Purpose | Command |
+|------|---------|---------|
+| **markdownlint** | Markdown linting | `markdownlint '**/*.md'` |
+| **codespell** | Spell checking for typos | `codespell --skip='.git,.snapshots,venv'` |
+
+### GitHub Security Features
+
+| Feature | Status | Purpose |
+|---------|--------|---------|
+| **Dependabot alerts** | ✅ Enabled | Monitor dependencies for vulnerabilities |
+| **Dependabot updates** | ✅ Enabled | Auto-create PRs for security fixes |
+| **CodeQL analysis** | ✅ Enabled | Deep semantic code analysis |
+| **Secret scanning** | ✅ Enabled | Detect committed secrets |
+
+### Running a Full Security Audit
+
+```bash
+# Python security
+bandit -r . -x ./snapshots,./venv -f txt
+pip-audit --desc
+
+# Shell scripts
+find . -name "*.sh" -not -path "./snapshots/*" -exec shellcheck {} \;
+
+# Docker
+hadolint Dockerfile
+
+# Dependencies
+grype dir:. --only-fixed
+
+# CodeQL (via GitHub Actions)
+gh api repos/greogory/hibp-checker/code-scanning/alerts --jq '.[].rule.id'
+
+# Secrets scan
+grep -rE "(api[_-]?key|password|secret|token).*=" --include="*.py" --include="*.sh" . | grep -v "example\|template\|\.git"
+```
+
+---
+
 ## Automated Security Checks
 
 ### GitHub Actions (Recommended)
